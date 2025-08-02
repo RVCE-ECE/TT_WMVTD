@@ -23,17 +23,17 @@ module tb ();
     wire [7:0] uio_out;
     wire [7:0] uio_oe;
 
-//`ifdef GL_TEST
-//    wire VPWR = 1'b1;
-//    wire VGND = 1'b0;
-//`endif
+`ifdef GL_TEST
+    wire VPWR = 1'b1;
+    wire VGND = 1'b0;
+`endif
 
     // Instantiate your top-level module
     tt_um_weighted_majority dut (
-//`ifdef GL_TEST
-//        .VPWR(VPWR),
-//        .VGND(VGND),
-//`endif
+`ifdef GL_TEST
+        .VPWR(VPWR),
+        .VGND(VGND),
+`endif
         .clk(clk),
         .rst_n(rst_n),
         .ena(ena),
