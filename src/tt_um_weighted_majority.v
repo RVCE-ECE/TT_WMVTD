@@ -2,7 +2,7 @@
  * Copyright (c) 2024 Aditya Varma, Nischay B S, Santhosh V, Syed Abdur Rahman, Meghana P Manru, Shylashree N, RV College of Engineering, Bengaluru
  * SPDX-License-Identifier: Apache-2.0
  */
-
+//
 `default_nettype none
 
 module tt_um_weighted_majority (
