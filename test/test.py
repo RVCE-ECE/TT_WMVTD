@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: © 2024 Tiny Tapeout
+# SPDX-FileCopyrightText: © 2024 Your Name
 # SPDX-License-Identifier: Apache-2.0
 
 import cocotb
@@ -7,34 +7,52 @@ from cocotb.triggers import ClockCycles
 
 
 @cocotb.test()
-async def test_project(dut):
-    dut._log.info("Start")
+async def trend_detector_test(dut):
+    """Cocotb test for Weighted Majority Voter / Trend Detector"""
 
-    # Set the clock period to 10 us (100 KHz)
-    clock = Clock(dut.clk, 10, units="us")
+    dut._log.info("Starting test and clock generation")
+
+    # Use 10 ns clock period (simulate 100 MHz clock)
+    clock = Clock(dut.clk, 10, units="ns")
     cocotb.start_soon(clock.start())
 
-    # Reset
-    dut._log.info("Reset")
+    # Initialize inputs
     dut.ena.value = 1
     dut.ui_in.value = 0
     dut.uio_in.value = 0
     dut.rst_n.value = 0
+
+    # Reset pulse (active low) for 10 clock cycles
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 2)  # Wait after reset release
 
-    dut._log.info("Test project behavior")
+    dut._log.info("Applying input stimulus")
 
-    # Set the input values you want to test
-    dut.ui_in.value = 20
-    dut.uio_in.value = 30
+    # Send 0s for 4 cycles
+    for _ in range(4):
+        dut.ui_in.value = 0
+        await ClockCycles(dut.clk, 1)
 
-    # Wait for one clock cycle to see the output values
-    await ClockCycles(dut.clk, 1)
+    # Send 1s for 5 cycles
+    for _ in range(5):
+        dut.ui_in.value = 1
+        await ClockCycles(dut.clk, 1)
 
-    # The following assersion is just an example of how to check the output values.
-    # Change it to match the actual expected output of your module:
-    assert dut.uo_out.value == 50
+    # Send 0s for 6 cycles
+    for _ in range(6):
+        dut.ui_in.value = 0
+        await ClockCycles(dut.clk, 1)
 
-    # Keep testing the module by changing the input values, waiting for
-    # one or more clock cycles, and asserting the expected output values.
+    # Allow some cycles to settle
+    await ClockCycles(dut.clk, 5)
+
+    dut._log.info(f"Final output trend: {dut.uo_out.value}")
+
+    # Example assertion — update this to match your expected value at this point
+    # For example, after last 0s, trend output should be 0 or 1 depending on hysteresis behavior
+    expected_trend = 0  # Set based on your expected final output
+    actual_trend = dut.uo_out.value.integer & 0x1  # Assume only bit 0 is valid output
+    assert actual_trend == expected_trend, f"Trend output mismatch: expected {expected_trend}, got {actual_trend}"
+
+    dut._log.info("Test completed successfully")
