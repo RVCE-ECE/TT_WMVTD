@@ -78,7 +78,7 @@ module tb ();
             #10;
         end
 
-        #100 $finish;
+//        #100 $finish;
     end
 
     // Optional monitor for debugging:
